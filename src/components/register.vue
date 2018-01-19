@@ -24,12 +24,12 @@
       <el-row>
         <el-col :span="8">
           <select>
-            <option :value="province">{{province}}</option>
+            <option v-for="item in province">{{item.value}}</option>
           </select>
         </el-col>
         <el-col :span="8">
           <select>
-            <option :value="city">{{city}}</option>
+            <option >{{city}}</option>
           </select>
         </el-col>
         <el-col :span="8">
@@ -116,18 +116,50 @@ export default {
         }
     },
     getCityData:function(){
+      var that = this
       axios.get('../../../static/json/map.json').then(function(response){
         if (response.status==200) {
-          console.log(response.data)
-        }
+            var data = response.data
+            that.province = []
+            that.city = []
+            that.block = []
+            for (var item in data) {
+                if (item.match(/0000$/)) {  //省级
+                  that.province.push({id: item, value: data[item], children: []})
+                }
+                else if (item.match(/00$/)) { //市级
+                  that.city.push({id: item, value: data[item], children: []})
+                }
+                else {                        //区级
+                  that.block.push({id: item, value: data[item]})
+                }
+            }
+            for(var item1 in that.city) {
+                for(var item2 in that.block) {//前四位一样，属于同一区级
+                    if (that.block[item2].id.slice(0, 4) === that.city[item1].id.slice(0, 4)) {
+                        that.city[item1].children.push(that.block[item2])
+                    }
+                }
+            }
+            for (var index in that.province) {//前两位一样，同一市
+                for (var index1 in that.city) {
+                  if (that.province[index].id.slice(0, 2)===that.city[index1].id.slice(0, 2)) {
+                        that.province[index].children.push(that.city[index1])
+                  }
+                }
+            }
+          }
         else{
-          console.log(response.status)
+            console.log(response.status)
         }
-      }).catch(function(error){console.log(typeof+ error)})
-    }
+      })
+        .catch(function(error){
+            console.log(typeof+ error)
+        })
+    },
   },
   created:function(){
-   this.getCityData();
+    this.getCityData();
   }
 
 }
