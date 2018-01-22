@@ -5,7 +5,7 @@
 	    element-loading-spinner="el-icon-loading"
 	    element-loading-background="rgba(0, 0, 0, 0.8)"
 	>
-		<div id="title">
+			<div id="title">
 	      注册（2/2）
 	    </div>
 	    <div id="tel_fa">

@@ -113,7 +113,7 @@
             duration:1000
           });
         }
-        else if (this.sheng=='') {
+        else if (this.block=='') {
           this.$notify({
             title: '提示',
             message: '请选择地区',
@@ -129,8 +129,8 @@
       // 表单提交数据
       submitData:function(){
         var bodyFormData = new FormData()
-        bodyFormData.set('mobile',this.phoneNumber);
-        bodyFormData.set('invite_code',this.invCode);
+        bodyFormData.append('mobile',this.phoneNumber);
+        bodyFormData.append('invite_code',this.invCode);
         // 后台验证邀请码
         axios({
           method:'post',
@@ -139,7 +139,7 @@
           config: { headers: {'Content-Type': 'application/x-www-form-urlencoded' }}
         })
         .then((response)=>{
-          if (response.data.success===1) {
+          if (response.data.success==1) {
             this.$notify({
               title: '提示',
               message: '邀请验证成功,短信验证已发送',
