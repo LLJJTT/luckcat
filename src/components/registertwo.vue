@@ -23,7 +23,7 @@
 	</div>
 </template>
 <script>
-import axios from 'axios'
+	import axios from 'axios'
 	export default{
 		data(){
 			return{
@@ -32,7 +32,8 @@ import axios from 'axios'
 				sureCode:'',
 				addressId:'',
 				loading:false,
-				url:'http://api.lkmao.com/v1/register_validate'
+				url:'http://api.lkmao.com/v1/register_validate',
+				urlCode:'http://api.lkmao.com/v1/register',
 			}
 		},
 		methods:{
@@ -41,19 +42,19 @@ import axios from 'axios'
 				if (this.sureCode=='') {
 					this.$notify({
 						title: '提示',
-			            message: '请输入验证码',
-			            offset: 100,
-			            type:'error',
-			            duration:1000
+	            message: '请输入验证码',
+	            offset: 100,
+	            type:'error',
+	            duration:1000
 					})
 				}
 				else if(this.sureCode.length!=6){
 					this.$notify({
 						title: '提示',
-			            message: '验证码长度为6位',
-			            offset: 100,
-			            type:'error',
-			            duration:1000
+	            message: '验证码长度为6位',
+	            offset: 100,
+	            type:'error',
+	            duration:1000
 					})
 				}
 				else{
@@ -62,7 +63,7 @@ import axios from 'axios'
 			},
 			// 发送验证码
 			send:function(){
-				let time = 60;
+				let time = 10;
 				const oResend = document.querySelector('#resend');
 				const timer = setInterval(function(){
 					time --;
@@ -71,7 +72,7 @@ import axios from 'axios'
 					oResend.style.background='#6d9fa6';
 					if (time==1) {
 						clearInterval(timer);
-						time = 60;
+						time = 10;
 						oResend.innerText = '重新发送';
 						oResend.removeAttribute('disabled');
 						oResend.style.background='#00bcd5';
@@ -79,9 +80,47 @@ import axios from 'axios'
 
 				},1000)
 			},
-			// 重新发送验证码
+			// 点击重新发送验证码
 			reSend:function(){
-				this.send();
+				this.reSendData();
+			},
+			//重新发验证码
+			reSendData:function(){
+				var newFormData = new FormData()
+				newFormData.set('mobile',this.telNumber)
+				newFormData.set('invite_code',this.invCode)
+				axios({
+	        method:'post',
+	        url:this.urlCode,
+	        data:newFormData,
+	        config: { headers: {'Content-Type': 'application/x-www-form-urlencoded' }}
+      	})
+	      	.then((response)=>{
+	      		if (response.data.success==1) {
+							this.send();
+      				this.$notify({
+		            title: '提示',
+		            message: '短信验证已发送',
+		            offset: 100,
+		            type:'error',
+		            duration:3000
+	          	});
+    					console.log(response.data.msg);
+      			}
+	      		else{
+	      			this.$notify({
+		            title: '提示',
+		            message: '邀请码不存在',
+		            offset: 100,
+		            type:'error',
+		            duration:4000
+			        });
+      				console.log(response.data.msg);
+	      		}
+	      	})
+	      	.catch((error)=>{
+	      		console.log(typeof + error)
+	      	})
 			},
 			// 接收数据
 			receiveData:function(){

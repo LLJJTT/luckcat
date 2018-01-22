@@ -13,7 +13,7 @@
             <input v-model="phoneNumber" type="number" placeholder="输入手机号">
           </li>
           <li>
-            <input v-model="invCode" type="number" placeholder="输入邀请码">
+            <input v-model="invCode" type="text" readonly="readonly">
           </li>
         </ul>
     </div>
@@ -69,204 +69,188 @@
     </div>
   </div>
 </template>
-
 <script>
-import axios from 'axios'
-export default {
-  data () {
-    return {
-      logo:'../static/img/logo.jpeg',
-      mapJson:'../static/json/map.json',
-      url:'http://api.lkmao.com/v1/register',
-      phoneNumber:'',
-      invCode:'',
-      province:'',
-      sheng: '',
-      shi: '',
-      shi1: [],
-      qu: '',
-      qu1: [],
-      city:'',
-      block:'',
-      E:''
-    }
-  },
-  methods:{
-    // 验证输入格式
-    startReg:function(){
-      const reg = /^[1][3,4,5,7,8][0-9]{9}$/;
-      if (this.phoneNumber=='') {
-        this.$notify({
-          title: '提示',
-          message: '请输入手机号',
-          offset: 100,
-          type:'error',
-          duration:1000,
-        });
-      }
-      else if(reg.test(this.phoneNumber)!=true){
-        this.$notify({
-          title: '提示',
-          message: '请输入正确手机号',
-          offset: 100,
-          type:'error',
-          duration:1000
-
-        });
-      }
-      else if (this.invCode=='') {
-        this.$notify({
-          title: '提示',
-          message: '请输入邀请码',
-          offset: 100,
-          type:'error',
-          duration:1000
-
-        });
-      }
-      else if (this.sheng=='') {
-        this.$notify({
-          title: '提示',
-          message: '请选择地区',
-          offset: 100,
-          type:'error',
-          duration:1000
-        });
-      }
-      else{
-        this.submitData();
+  import axios from 'axios'
+  export default {
+    data () {
+      return {
+        logo:'../static/img/logo.jpeg',
+        mapJson:'../static/json/map.json',
+        url:'http://api.lkmao.com/v1/register',
+        phoneNumber:'',
+        invCode:'',
+        province:'',
+        sheng: '',
+        shi: '',
+        shi1: [],
+        qu: '',
+        qu1: [],
+        city:'',
+        block:'',
+        E:'',
+        URL:''
       }
     },
-    // 表单提交数据
-    submitData:function(){
-      var bodyFormData = new FormData()
-      bodyFormData.set('mobile',this.phoneNumber);
-      bodyFormData.set('invite_code',this.invCode);
-      // 后台验证邀请码
-      axios({
-        method:'post',
-        url:this.url,
-        data:bodyFormData,
-        config: { headers: {'Content-Type': 'application/x-www-form-urlencoded' }}
-      })
-      .then((response)=>{
-        if (response.data.success===1) {
+    methods:{
+      // 验证输入格式
+      startReg:function(){
+        const reg = /^[1][3,4,5,7,8][0-9]{9}$/;
+        if (this.phoneNumber=='') {
           this.$notify({
             title: '提示',
-            message: '邀请验证成功,短信验证已发送',
+            message: '请输入手机号',
             offset: 100,
             type:'error',
-            duration:3000
+            duration:1000,
           });
-          // this.$router.push({
-          //   name:'register',
-          //   params:{
-          //     mobile:this.phoneNumber,
-          //     invite_code:this.invCode,
-          //     address_id:this.E
-          //   },
-          //   path:'/registertwo'
-          // })
+        }
+        else if(reg.test(this.phoneNumber)!=true){
+          this.$notify({
+            title: '提示',
+            message: '请输入正确手机号',
+            offset: 100,
+            type:'error',
+            duration:1000
+          });
+        }
+        else if (this.sheng=='') {
+          this.$notify({
+            title: '提示',
+            message: '请选择地区',
+            offset: 100,
+            type:'error',
+            duration:1000
+          });
         }
         else{
-          this.$router.push({
-            name:'registertwo',
-            params:{
-              mobile:this.phoneNumber,
-              invite_code:this.invCode,
-              address_id:this.E
-            },
-          })
-          // this.$notify({
-          //   title: '提示',
-          //   message: '邀请码不错在',
-          //   offset: 100,
-          //   type:'error',
-          //   duration:4000
-          // });
-          // console.log(response.data.msg);
+          this.submitData();
         }
-      })
-      .catch((error)=>{
-        console.log(error)
-      })
-    },
-    // 加载china地点数据，三级
-    getCityData:function(){
-      var that = this
-      axios.get(this.mapJson).then(function(response){
-        if (response.status==200) {
-          var data = response.data
-          that.province = []
-          that.city = []
-          that.block = []
-          // 省市区数据分类
-          for (var item in data) {
-            if (item.match(/0000$/)) {//省
-              that.province.push({id: item, value: data[item], children: []})
-            } else if (item.match(/00$/)) {//市
-              that.city.push({id: item, value: data[item], children: []})
-            } else {//区
-              that.block.push({id: item, value: data[item]})
-            }
+      },
+      // 表单提交数据
+      submitData:function(){
+        var bodyFormData = new FormData()
+        bodyFormData.set('mobile',this.phoneNumber);
+        bodyFormData.set('invite_code',this.invCode);
+        // 后台验证邀请码
+        axios({
+          method:'post',
+          url:this.url,
+          data:bodyFormData,
+          config: { headers: {'Content-Type': 'application/x-www-form-urlencoded' }}
+        })
+        .then((response)=>{
+          if (response.data.success===1) {
+            this.$notify({
+              title: '提示',
+              message: '邀请验证成功,短信验证已发送',
+              offset: 100,
+              type:'error',
+              duration:3000
+            });
           }
-          // 分类市级
-          for (var index in that.province) {
-            for (var index1 in that.city) {
-              if (that.province[index].id.slice(0, 2) === that.city[index1].id.slice(0, 2)) {
-                that.province[index].children.push(that.city[index1])
+          else{
+            this.$router.push({
+              name:'registertwo',
+              params:{
+                mobile:this.phoneNumber,
+                invite_code:this.invCode,
+                address_id:this.E
+              },
+            })
+            // this.$notify({
+            //   title: '提示',
+            //   message: '邀请码不错在',
+            //   offset: 100,
+            //   type:'error',
+            //   duration:4000
+            // });
+            // console.log(response.data.msg);
+          }
+        })
+        .catch((error)=>{
+          console.log(error)
+        })
+      },
+      // 加载china地点数据，三级
+      getCityData:function(){
+        var that = this
+        axios.get(this.mapJson).then(function(response){
+          if (response.status==200) {
+            var data = response.data
+            that.province = []
+            that.city = []
+            that.block = []
+            // 省市区数据分类
+            for (var item in data) {
+              if (item.match(/0000$/)) {//省
+                that.province.push({id: item, value: data[item], children: []})
+              } else if (item.match(/00$/)) {//市
+                that.city.push({id: item, value: data[item], children: []})
+              } else {//区
+                that.block.push({id: item, value: data[item]})
+              }
+            }
+            // 分类市级
+            for (var index in that.province) {
+              for (var index1 in that.city) {
+                if (that.province[index].id.slice(0, 2) === that.city[index1].id.slice(0, 2)) {
+                  that.province[index].children.push(that.city[index1])
+                }
+              }
+            }
+            // 分类区级
+            for(var item1 in that.city) {
+              for(var item2 in that.block) {
+                if (that.block[item2].id.slice(0, 4) === that.city[item1].id.slice(0, 4)) {
+                  that.city[item1].children.push(that.block[item2])
+                }
               }
             }
           }
-          // 分类区级
-          for(var item1 in that.city) {
-            for(var item2 in that.block) {
-              if (that.block[item2].id.slice(0, 4) === that.city[item1].id.slice(0, 4)) {
-                that.city[item1].children.push(that.block[item2])
-              }
-            }
+          else{
+            console.log(response.status)
           }
-          
+        }).catch(function(error){console.log(typeof+ error)})
+      },
+      // 选省
+      choseProvince:function(e) {
+        for (var index2 in this.province) {
+          if (e === this.province[index2].id) {
+            this.shi1 = this.province[index2].children
+            this.shi = this.province[index2].children[0].value
+            this.qu1 =this.province[index2].children[0].children
+            this.qu = this.province[index2].children[0].children[0].value
+            this.E = this.qu1[0].id
+          }
         }
-        else{
-          console.log(response.status)
+      },
+      // 选市
+      choseCity:function(e) {
+        for (var index3 in this.city) {
+          if (e === this.city[index3].id) {
+            this.qu1 = this.city[index3].children
+            this.qu = this.city[index3].children[0].value
+            this.E = this.qu1[0].id
+            console.log(this.E)
+          }
         }
-      }).catch(function(error){console.log(typeof+ error)})
-    },
-    // 选省
-    choseProvince (e) {
-      for (var index2 in this.province) {
-        if (e === this.province[index2].id) {
-          this.shi1 = this.province[index2].children
-          this.shi = this.province[index2].children[0].value
-          this.qu1 =this.province[index2].children[0].children
-          this.qu = this.province[index2].children[0].children[0].value
-        }
+      },
+      // 选区
+      choseBlock:function(e) {
+        this.E=e;
+        // console.log(this.E)
+      },
+      getUrl:function(){
+        this.invCode =window.location.href
+        console.log(this.invCode)
       }
     },
-    // 选市
-    choseCity (e) {
-      for (var index3 in this.city) {
-        if (e === this.city[index3].id) {
-          this.qu1 = this.city[index3].children
-          this.qu = this.city[index3].children[0].value
-        }
-      }
-    },
-    // 选区
-    choseBlock (e) {
-      this.E=e;
-      console.log(this.E)
-    },
-  },
-  created:function(){
-   this.getCityData();
-  }
-
+    created:function(){
+      this.getCityData()
+      this.getUrl()   
+    }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang='scss' scoped>
   #register{
     height:100%;
@@ -278,7 +262,6 @@ export default {
         font-weight:bold;
         letter-spacing:.12rem;
         color:#fff;
-
     }
     #div_img{
       margin-top: 2rem;
@@ -307,7 +290,7 @@ export default {
             padding:.6rem 0;
             font-size:.8rem;
             text-indent:.6rem;
-            color:#f63300;
+            color:#141618;
             font-weight:bold;
             border-bottom:1px solid #cac9c9;
           }
@@ -367,10 +350,6 @@ export default {
         font-size:1rem;
       }
     }
-
-
-
-
   }
 </style>
 
