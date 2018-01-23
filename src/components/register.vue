@@ -1,5 +1,10 @@
 <template>
-  <div id="register">
+  <div id="register"
+      v-loading="loading"
+      element-loading-text="注册中请稍后"
+      element-loading-spinner="el-icon-loading"
+      element-loading-background="rgba(0, 0, 0, 0.8)"
+  >
     <div id="title">
       注册（1/2）
     </div>
@@ -11,9 +16,11 @@
         <ul>
           <li>
             <input v-model="phoneNumber" type="number" placeholder="输入手机号">
+            <div class="border_div"></div>
           </li>
           <li>
-            <input v-model="invCode" type="text" readonly="readonly">
+            <input v-model="invCode" :disabled="disabled" placeholder="请输入邀请码">
+            <div class="border_div"></div>
           </li>
         </ul>
     </div>
@@ -74,6 +81,7 @@
   export default {
     data () {
       return {
+        loading:false,
         logo:'../static/img/logo.jpeg',
         mapJson:'../static/json/map.json',
         url:'http://api.lkmao.com/v1/register',
@@ -88,7 +96,8 @@
         city:'',
         block:'',
         E:'',
-        URL:''
+        URL:'',
+        disabled:true
       }
     },
     methods:{
@@ -113,7 +122,7 @@
             duration:1000
           });
         }
-        else if (this.block=='') {
+        else if (this.E=='') {
           this.$notify({
             title: '提示',
             message: '请选择地区',
@@ -122,7 +131,8 @@
             duration:1000
           });
         }
-        else{
+        else if (reg.test(this.phoneNumber)==true&&this.E!=''){
+          console.log(this.E)
           this.submitData();
         }
       },
@@ -144,11 +154,9 @@
               title: '提示',
               message: '邀请验证成功,短信验证已发送',
               offset: 100,
-              type:'error',
+              type:'success',
               duration:3000
             });
-          }
-          else{
             this.$router.push({
               name:'registertwo',
               params:{
@@ -157,14 +165,16 @@
                 address_id:this.E
               },
             })
-            // this.$notify({
-            //   title: '提示',
-            //   message: '邀请码不错在',
-            //   offset: 100,
-            //   type:'error',
-            //   duration:4000
-            // });
-            // console.log(response.data.msg);
+          }
+          else{
+            this.$notify({
+              title: '提示',
+              message: '邀请码不存在',
+              offset: 100,
+              type:'error',
+              duration:3000
+            });
+            console.log(response.data.msg);
           }
         })
         .catch((error)=>{
@@ -240,14 +250,20 @@
         this.E=e;
         // console.log(this.E)
       },
-      getUrl:function(){
-        this.invCode =window.location.href
-        console.log(this.invCode)
+      getUrl:function (){
+        this.URL = window.location.search
+        var a = this.URL.match(/[0-9]{6,11}$/)
+        if (!a) {
+          this.disabled=false;
+        }
+        else{
+          this.invCode = a[0]
+        }
       }
     },
     created:function(){
       this.getCityData()
-      this.getUrl()   
+      this.getUrl()
     }
 }
 </script>
@@ -292,7 +308,10 @@
             text-indent:.6rem;
             color:#141618;
             font-weight:bold;
-            border-bottom:1px solid #cac9c9;
+          }
+          .border_div{
+            height:1px;
+            background: #d0d0d0;
           }
         }
         li:last-child{
