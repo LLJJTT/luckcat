@@ -131,8 +131,17 @@
             duration:1000
           });
         }
-        else if (reg.test(this.phoneNumber)==true&&this.E!=''){
-          console.log(this.E)
+        else if (this.invCode=='') {
+          this.$notify({
+            title: '提示',
+            message: '请输入邀请码',
+            offset: 100,
+            type:'error',
+            duration:1000
+          });
+        }
+        else if (reg.test(this.phoneNumber)==true&&this.E!=''&&this.invCode!=''){
+          // console.log(this.E)
           this.submitData();
         }
       },
@@ -169,12 +178,12 @@
           else{
             this.$notify({
               title: '提示',
-              message: '邀请码不存在',
+              message: response.data.msg,
               offset: 100,
               type:'error',
               duration:3000
             });
-            console.log(response.data.msg);
+            // console.log(response.data.msg);
           }
         })
         .catch((error)=>{
@@ -241,7 +250,7 @@
             this.qu1 = this.city[index3].children
             this.qu = this.city[index3].children[0].value
             this.E = this.qu1[0].id
-            console.log(this.E)
+            // console.log(this.E)
           }
         }
       },

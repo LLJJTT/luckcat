@@ -8,11 +8,13 @@
 			<div id="title">
 	      注册（2/2）
 	    </div>
-	    <div id="tel_fa">
-	    	<input  value="手机号" disabled="disabled"><input value="邀请码"  disabled="disabled" >
-	    </div>
-	    <div id="tel">
-	    	<input v-model="telNumber" type="text" disabled="disabled"><input v-model="invCode" disabled="disabled" >
+	    <div id="hidden">
+	    	<div id="tel_fa">
+		    	<input  value="手机号" disabled="disabled"><input value="邀请码"  disabled="disabled" >
+		    </div>
+		    <div id="tel">
+		    	<input v-model="telNumber" type="text" disabled="disabled"><input v-model="invCode" disabled="disabled" >
+		    </div>
 	    </div>
 	    <div id="code">
 	    	<input v-model="sureCode" type="number" placeholder="输入短信验证码"><button @click="reSend" id="resend">立即发送</button>
@@ -104,7 +106,7 @@
 	            type:'error',
 	            duration:3000
           	});
-  					console.log(response.data.msg);
+  					// console.log(response.data.msg);
     			}
       		else{
       			this.$notify({
@@ -114,7 +116,7 @@
 	            type:'error',
 	            duration:4000
 		        });
-    				console.log(response.data.msg);
+    				// console.log(response.data.msg);
       		}
       	})
       	.catch((error)=>{
@@ -142,7 +144,8 @@
 		        config: { headers: {'Content-Type': 'application/x-www-form-urlencoded' }}
 				})
 				.then((response)=>{
-					console.log(response.data);
+					// console.log(response.data);
+					// console.log(this.telNumber+this.sureCode+this.invCode+this.addressId)
 					if (response.data.success==1) {
 						this.loading=false
 						this.$notify({
@@ -196,7 +199,10 @@
 	      font-weight:bold;
 	      letter-spacing:.12rem;
 	      color:#fff;
-	  	}
+	  }
+	  #hidden{
+	  	display:none;
+	  }
 	  	#code{
 	  		margin-top: 2rem;
 	  		input{
